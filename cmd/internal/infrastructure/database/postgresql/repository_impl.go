@@ -24,7 +24,7 @@ func NewPostgresqlRepository(db *sql.DB) ports.ConsumptionRepository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) GetConsumption(ctx context.Context, meterID int, startDate, endDate, kindPeriod string) ([]domain.EnergyConsumption, error) {
+func (r *Repository) GetConsumption(ctx context.Context, meterID int, startDate, endDate string) ([]domain.EnergyConsumption, error) {
 
 	start, end, errParseDate := parseDates(startDate, endDate)
 	if errParseDate != nil {
@@ -32,10 +32,10 @@ func (r *Repository) GetConsumption(ctx context.Context, meterID int, startDate,
 	}
 
 	rows, errQuery := r.db.QueryContext(ctx, energyConsumptionQuery, meterID, start, end)
+	defer rows.Close()
 	if errQuery != nil {
 		return nil, errors.ErrSearchingData
 	}
-	defer rows.Close()
 
 	var consumptions []domain.EnergyConsumption
 	for rows.Next() {
