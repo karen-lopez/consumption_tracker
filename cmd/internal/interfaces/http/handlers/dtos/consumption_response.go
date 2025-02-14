@@ -1,6 +1,6 @@
 package dtos
 
-type DataGraph struct {
+type MeterData struct {
 	MeterID            int    `json:"meter_id"`
 	Address            string `json:"address"`
 	Active             []int  `json:"active"`
@@ -11,5 +11,5 @@ type DataGraph struct {
 
 type ConsumptionResponse struct {
 	Period    []string    `json:"period"`
-	DataGraph []DataGraph `json:"data_graph"`
+	DataGraph []MeterData `json:"data_graph"`
 }

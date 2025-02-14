@@ -1,6 +1,9 @@
 package dtos
 
-import "time"
+import (
+	"consumption_tracker/cmd/pkg/errors"
+	"time"
+)
 
 type ConsumptionRequest struct {
 	MeterID    string `json:"meters_ids" binding:"required"`
@@ -11,16 +14,16 @@ type ConsumptionRequest struct {
 
 func (consumptionRequest *ConsumptionRequest) Validate() error {
 	if consumptionRequest.MeterID == "" {
-		return ErrInvalidMeterID
+		return errors.ErrInvalidMeterID
 	}
 	if _, err := time.Parse("2025-01-01", consumptionRequest.StartDate); err != nil {
-		return ErrInvalidDate
+		return errors.ErrInvalidDate
 	}
 	if _, err := time.Parse("2025-01-01", consumptionRequest.EndDate); err != nil {
-		return ErrInvalidDate
+		return errors.ErrInvalidDate
 	}
 	if consumptionRequest.KindPeriod == "" {
-		return ErrInvalidPeriod
+		return errors.ErrInvalidPeriod
 	}
 	return nil
 }

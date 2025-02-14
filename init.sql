@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS energy_consumption (
+CREATE TABLE IF NOT EXISTS consumption_tracker (
     id SERIAL PRIMARY KEY,
     meter_id INT NOT NULL,
     active_energy INT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS energy_consumption (
     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-COPY energy_consumption (meter_id, active_energy, reactive_energy, capacitive_reactive, solar, date)
+COPY consumption_tracker (meter_id, active_energy, reactive_energy, capacitive_reactive, solar, date)
     FROM '/docker-entrypoint-initdb.d/consumptions.csv'
     DELIMITER ','
     CSV HEADER;

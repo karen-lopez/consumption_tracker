@@ -18,7 +18,7 @@ type EnergyConsumption struct {
 
 func (e *EnergyConsumption) Validate() error {
 	if e.MeterID <= 0 {
-		return errors.ErrInvalidInput
+		return errors.ErrInvalidMeterID
 	}
 	if e.MeterAddress == "" {
 		return errors.ErrInvalidInput
