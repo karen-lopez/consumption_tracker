@@ -5,6 +5,7 @@ import "time"
 type EnergyConsumption struct {
 	ID                 int
 	MeterID            int
+	MeterAddress       string
 	ActiveEnergy       int
 	ReactiveEnergy     int
 	CapacitiveReactive int
@@ -14,6 +15,9 @@ type EnergyConsumption struct {
 
 func (e *EnergyConsumption) Validate() error {
 	if e.MeterID <= 0 {
+		return ErrInvalidInput
+	}
+	if e.MeterAddress == "" {
 		return ErrInvalidInput
 	}
 	if e.ActiveEnergy < 0 || e.ReactiveEnergy < 0 || e.CapacitiveReactive < 0 || e.Solar < 0 {
