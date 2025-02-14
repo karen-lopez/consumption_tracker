@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"consumption_tracker/cmd/pkg/errors"
+	"time"
+)
 
 type EnergyConsumption struct {
 	ID                 int
@@ -15,16 +18,16 @@ type EnergyConsumption struct {
 
 func (e *EnergyConsumption) Validate() error {
 	if e.MeterID <= 0 {
-		return ErrInvalidInput
+		return errors.ErrInvalidInput
 	}
 	if e.MeterAddress == "" {
-		return ErrInvalidInput
+		return errors.ErrInvalidInput
 	}
 	if e.ActiveEnergy < 0 || e.ReactiveEnergy < 0 || e.CapacitiveReactive < 0 || e.Solar < 0 {
-		return ErrInvalidInput
+		return errors.ErrInvalidInput
 	}
 	if e.Date.IsZero() {
-		return ErrInvalidInput
+		return errors.ErrInvalidInput
 	}
 	return nil
 }
