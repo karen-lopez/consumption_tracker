@@ -24,11 +24,6 @@ func LoadEnv() (*Config, error) {
 		return nil, fmt.Errorf("ADDRESS_SERVICE_URL: %w", err)
 	}
 
-	cfg.APIToken, err = getEnv("API_TOKEN")
-	if err != nil {
-		return nil, fmt.Errorf("API_TOKEN: %w", err)
-	}
-
 	cfg.PostgresUser, err = getEnv("POSTGRES_USER")
 	if err != nil {
 		return nil, fmt.Errorf("POSTGRES_USER: %w", err)
