@@ -31,5 +31,10 @@ func (h *ConsumptionHandler) GetConsumption(c *gin.Context) {
 		return
 	}
 
+	if consumptions == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no consumption data found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, consumptions)
 }

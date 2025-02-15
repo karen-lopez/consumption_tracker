@@ -6,7 +6,7 @@ import (
 	"consumption_tracker/cmd/internal/infrastructure/dtos"
 	"consumption_tracker/cmd/pkg/errors"
 	"consumption_tracker/cmd/pkg/utils"
-	"time"
+	"log"
 
 	"context"
 	"database/sql"
@@ -29,6 +29,7 @@ func (r *Repository) GetConsumption(ctx context.Context, meterID int, startDate,
 
 	start, end, errParseDate := parseDates(startDate, endDate)
 	if errParseDate != nil {
+		log.Print("Error parsing dates " + errParseDate.Error())
 		return nil, errParseDate
 	}
 
@@ -70,11 +71,14 @@ func dtoToDomainEntity(consumptionsDB []dtos.EnergyConsumptionDB) ([]domain.Ener
 	return consumptions, nil
 }
 
-func parseDates(startDate string, endDate string) (time.Time, time.Time, error) {
+func parseDates(startDate string, endDate string) (string, string, error) {
 	start, errStartDate := utils.ParseDateToTime(startDate)
 	end, errEndDate := utils.ParseDateToTime(endDate)
 	if errStartDate != nil || errEndDate != nil {
-		return start, end, errors.ErrParsingDate
+		return "", "", errors.ErrParsingDate
 	}
-	return start, end, nil
+	formatStartDate := utils.ParseToString(start)
+	formatEndDate := utils.ParseToString(end)
+	log.Println("Start Date: ", formatStartDate)
+	return formatStartDate, formatEndDate, nil
 }

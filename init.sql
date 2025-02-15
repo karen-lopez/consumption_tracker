@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS energy_consumption (
     id UUID PRIMARY KEY,
     meter_id INT NOT NULL,
-    active_energy INT NOT NULL,
-    reactive_energy INT NOT NULL,
-    capacitive_reactive INT NOT NULL,
-    solar INT NOT NULL,
+    active_energy BIGINT NOT NULL,
+    reactive_energy BIGINT NOT NULL,
+    capacitive_reactive BIGINT NOT NULL,
+    solar BIGINT NOT NULL,
     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

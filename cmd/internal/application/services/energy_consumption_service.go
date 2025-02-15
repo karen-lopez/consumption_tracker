@@ -5,13 +5,17 @@ import (
 	"consumption_tracker/cmd/internal/core/ports"
 	"consumption_tracker/cmd/internal/interfaces/http/handlers/dtos"
 	"context"
+	"log"
 	"time"
 )
 
 const (
-	MonthFormat = "Jan 2024"
+	MonthFormat = "Jan 2006"
 	WeekFormat  = "Jan 01 - Jan 07"
-	DayFormat   = "Jan 01"
+	DayFormat   = "Jan 02"
+	Month       = "monthly"
+	Week        = "weekly"
+	Day         = "daily"
 )
 
 type EnergyConsumptionService struct {
@@ -28,16 +32,19 @@ func (s *EnergyConsumptionService) GetConsumption(ctx context.Context, meterId i
 	if err != nil {
 		return nil, err
 	}
+	if len(consumptions) == 0 {
+		return nil, nil
+	}
 	address, addressErr := s.addressService.GetAddressByMeterID(ctx, meterId)
 	if addressErr != nil {
 		return nil, addressErr
 	}
 	switch kindPeriod {
-	case "day":
+	case Day:
 		return getConsumptionsByRange(consumptions, address, DayFormat), nil
-	case "month":
+	case Month:
 		return getConsumptionsByRange(consumptions, address, MonthFormat), nil
-	case "week":
+	case Week:
 		return getConsumptionsByRange(consumptions, address, WeekFormat), nil
 	}
 	return nil, nil
@@ -57,10 +64,15 @@ func getConsumptionsByRange(consumptions []domain.EnergyConsumption, address, pe
 		period := c.Date.Format(periodFormat)
 		if isNextRangePeriod(c.Date, currentPeriod, period, isWeek) {
 			periodIndex++
+			groupedData.Active = append(groupedData.Active, 0)
+			groupedData.ReactiveInductive = append(groupedData.ReactiveInductive, 0)
+			groupedData.ReactiveCapacitive = append(groupedData.ReactiveCapacitive, 0)
+			groupedData.Exported = append(groupedData.Exported, 0)
 			currentPeriod = period
 			periods = append(periods, period)
 		}
 		if index == 0 {
+			log.Print("First consumption: ", c)
 			groupedData = &dtos.MeterData{
 				MeterID:            c.MeterID,
 				Address:            address,
@@ -71,6 +83,7 @@ func getConsumptionsByRange(consumptions []domain.EnergyConsumption, address, pe
 			}
 		}
 		sumConsumptionToGroupedData(groupedData, periodIndex, c)
+		log.Print("Grouped Data : ", groupedData)
 	}
 
 	response := &dtos.ConsumptionResponse{
