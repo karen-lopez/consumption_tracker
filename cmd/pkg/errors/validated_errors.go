@@ -7,4 +7,5 @@ var (
 	ErrInvalidDate    = errors.New("invalid date")
 	ErrInvalidPeriod  = errors.New("invalid period")
 	ErrInvalidInput   = errors.New("invalid input")
+	ErrInvalidAddress = errors.New("invalid address")
 )

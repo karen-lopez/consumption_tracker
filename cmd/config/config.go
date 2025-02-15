@@ -7,7 +7,6 @@ type Config struct {
 	ServerPort        string `mapstructure:"SERVER_PORT"`
 	DBURL             string `mapstructure:"DB_URL"`
 	AddressServiceURL string `mapstructure:"ADDRESS_SERVICE_URL"`
-	APIToken          string `mapstructure:"API_TOKEN"`
 	PostgresUser      string `mapstructure:"POSTGRES_USER"`
 	PostgresPassword  string `mapstructure:"POSTGRES_PASSWORD"`
 	PostgresDB        string `mapstructure:"POSTGRES_DB"`

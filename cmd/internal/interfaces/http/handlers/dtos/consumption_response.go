@@ -10,6 +10,6 @@ type MeterData struct {
 }
 
 type ConsumptionResponse struct {
-	Period    []string    `json:"period"`
-	DataGraph []MeterData `json:"data_graph"`
+	Period    []string     `json:"period"`
+	DataGraph []*MeterData `json:"data_graph"`
 }

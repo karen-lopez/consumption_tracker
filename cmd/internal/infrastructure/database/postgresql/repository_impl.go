@@ -3,7 +3,7 @@ package postgresql
 import (
 	"consumption_tracker/cmd/internal/core/domain"
 	"consumption_tracker/cmd/internal/core/ports"
-	"consumption_tracker/cmd/internal/infrastructure/database/postgresql/dtos"
+	"consumption_tracker/cmd/internal/infrastructure/dtos"
 	"consumption_tracker/cmd/pkg/errors"
 	"consumption_tracker/cmd/pkg/utils"
 	"time"
@@ -12,8 +12,8 @@ import (
 	"database/sql"
 )
 
-const energyConsumptionQuery = `SELECT meter_id, active_energy, reactive_energy, capacitive_reactive, solar, date
-        FROM consumption_tracker
+const energyConsumptionQuery = `SELECT meter_id, active_energy, reactive_energy, capacitive_reactive, solar, date 
+		FROM energy_consumption
         WHERE meter_id = $1 AND date BETWEEN $2 AND $3
         ORDER BY date ASC`
 

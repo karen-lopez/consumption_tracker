@@ -1,11 +1,10 @@
 package ports
 
 import (
-	"consumption_tracker/cmd/internal/core/domain"
+	"consumption_tracker/cmd/internal/interfaces/http/handlers/dtos"
 	"context"
 )
 
 type ConsumptionTrackerService interface {
-	GetConsumption(ctx context.Context, meterId, startDate, endDate string) ([]domain.EnergyConsumption, error)
-	GetConsumptionWithAddress(ctx context.Context, meterId, startDate, endDate string) ([]domain.EnergyConsumption, error)
+	GetConsumption(ctx context.Context, meterId int, startDate, endDate, kindPeriod string) (*dtos.ConsumptionResponse, error)
 }
