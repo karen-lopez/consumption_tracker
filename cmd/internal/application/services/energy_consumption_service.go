@@ -4,18 +4,21 @@ import (
 	"consumption_tracker/cmd/internal/core/domain"
 	"consumption_tracker/cmd/internal/core/ports"
 	"consumption_tracker/cmd/internal/interfaces/http/handlers/dtos"
+	"consumption_tracker/cmd/pkg/utils"
 	"context"
+	"fmt"
 	"log"
 	"time"
 )
 
 const (
 	MonthFormat = "Jan 2006"
-	WeekFormat  = "Jan 01 - Jan 07"
-	DayFormat   = "Jan 02"
+	WeekFormat  = "Jan 02"
+	DayFormat   = "Jan 2"
 	Month       = "monthly"
 	Week        = "weekly"
 	Day         = "daily"
+	DaysInWeek  = 7
 )
 
 type EnergyConsumptionService struct {
@@ -41,46 +44,31 @@ func (s *EnergyConsumptionService) GetConsumption(ctx context.Context, meterId i
 	}
 	switch kindPeriod {
 	case Day:
-		return getConsumptionsByRange(consumptions, address, DayFormat), nil
+		return getConsumptionsByRange(consumptions, address, DayFormat, startDate), nil
 	case Month:
-		return getConsumptionsByRange(consumptions, address, MonthFormat), nil
+		return getConsumptionsByRange(consumptions, address, MonthFormat, startDate), nil
 	case Week:
-		return getConsumptionsByRange(consumptions, address, WeekFormat), nil
+		return getConsumptionsByRange(consumptions, address, WeekFormat, startDate), nil
 	}
 	return nil, nil
 }
 
-func getConsumptionsByRange(consumptions []domain.EnergyConsumption, address, periodFormat string) *dtos.ConsumptionResponse {
+func getConsumptionsByRange(consumptions []domain.EnergyConsumption, address, periodFormat, startDate string) *dtos.ConsumptionResponse {
 	var groupedData *dtos.MeterData
+	var currentPeriod time.Time
 	periodIndex := 0
 	isWeek := periodFormat == WeekFormat
-	if isWeek {
-		periodFormat = DayFormat
-	}
-	currentPeriod := consumptions[0].Date.Format(periodFormat)
-	periods := []string{currentPeriod}
+	var periods []string
 
 	for index, c := range consumptions {
-		period := c.Date.Format(periodFormat)
-		if isNextRangePeriod(c.Date, currentPeriod, period, isWeek) {
-			periodIndex++
-			groupedData.Active = append(groupedData.Active, 0)
-			groupedData.ReactiveInductive = append(groupedData.ReactiveInductive, 0)
-			groupedData.ReactiveCapacitive = append(groupedData.ReactiveCapacitive, 0)
-			groupedData.Exported = append(groupedData.Exported, 0)
-			currentPeriod = period
-			periods = append(periods, period)
-		}
+		date := c.Date.Format(periodFormat)
 		if index == 0 {
 			log.Print("First consumption: ", c)
-			groupedData = &dtos.MeterData{
-				MeterID:            c.MeterID,
-				Address:            address,
-				Active:             []int{c.ActiveEnergy},
-				ReactiveInductive:  []int{c.ReactiveEnergy},
-				ReactiveCapacitive: []int{c.CapacitiveReactive},
-				Exported:           []int{c.Solar},
-			}
+			groupedData = initializeGroupedData(c, address)
+			currentPeriod, periods = initializePeriods(isWeek, startDate, periodFormat, periods)
+		}
+		if isNextRangePeriod(currentPeriod, c.Date, isWeek, periodFormat) {
+			currentPeriod, periodIndex, periods = nextPeriod(currentPeriod, periodIndex, groupedData, date, periods, isWeek)
 		}
 		sumConsumptionToGroupedData(groupedData, periodIndex, c)
 		log.Print("Grouped Data : ", groupedData)
@@ -93,12 +81,59 @@ func getConsumptionsByRange(consumptions []domain.EnergyConsumption, address, pe
 	return response
 }
 
-func isNextRangePeriod(date time.Time, currentPeriod string, period string, isWeek bool) bool {
-	if isWeek {
-		nextDate := date.AddDate(0, 0, 6)
-		return nextDate.Format(DayFormat) != currentPeriod
+func initializePeriods(isWeek bool, startDate string, periodFormat string, periods []string) (time.Time, []string) {
+	currentPeriod, err := utils.ParseDateToTime(startDate)
+	if err != nil {
+		return time.Time{}, nil
 	}
-	return period != currentPeriod
+	log.Print("Current Period: ", currentPeriod)
+	if isWeek {
+		endWeek := currentPeriod.AddDate(0, 0, DaysInWeek-1)
+		log.Println("Current Period : ", currentPeriod)
+		weekPeriod := fmt.Sprintf("%s - %s", currentPeriod.Format(periodFormat), endWeek.Format(periodFormat))
+		periods = append(periods, weekPeriod)
+		log.Println("endWeek Period: ", endWeek)
+		log.Println("weekPeriod: ", weekPeriod)
+	} else {
+		periods = append(periods, currentPeriod.Format(periodFormat))
+	}
+	return currentPeriod, periods
+}
+
+func nextPeriod(currentPeriod time.Time, periodIndex int, groupedData *dtos.MeterData, date string, periods []string, isWeek bool) (time.Time, int, []string) {
+	periodIndex++
+	period := date
+	groupedData.Active = append(groupedData.Active, 0)
+	groupedData.ReactiveInductive = append(groupedData.ReactiveInductive, 0)
+	groupedData.ReactiveCapacitive = append(groupedData.ReactiveCapacitive, 0)
+	groupedData.Exported = append(groupedData.Exported, 0)
+	if isWeek {
+		startNextWeek := currentPeriod.AddDate(0, 0, DaysInWeek)
+		endNextWeek := startNextWeek.AddDate(0, 0, DaysInWeek)
+		period = fmt.Sprintf("%s - %s", startNextWeek.Format(WeekFormat), endNextWeek.Format(WeekFormat))
+		currentPeriod = startNextWeek
+	}
+	periods = append(periods, period)
+	return currentPeriod, periodIndex, periods
+}
+
+func isNextRangePeriod(currentPeriod time.Time, date time.Time, isWeek bool, periodFormat string) bool {
+	if isWeek {
+		nextPeriodDate := currentPeriod.AddDate(0, 0, DaysInWeek-1)
+		return date.After(nextPeriodDate)
+	}
+	return date.Format(periodFormat) != currentPeriod.Format(periodFormat)
+}
+
+func initializeGroupedData(c domain.EnergyConsumption, address string) *dtos.MeterData {
+	return &dtos.MeterData{
+		MeterID:            c.MeterID,
+		Address:            address,
+		Active:             []int{c.ActiveEnergy},
+		ReactiveInductive:  []int{c.ReactiveEnergy},
+		ReactiveCapacitive: []int{c.CapacitiveReactive},
+		Exported:           []int{c.Solar},
+	}
 }
 
 func sumConsumptionToGroupedData(groupedData *dtos.MeterData, periodIndex int, c domain.EnergyConsumption) {
