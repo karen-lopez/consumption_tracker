@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"consumption_tracker/cmd/internal/core/domain"
-	"consumption_tracker/cmd/internal/core/ports"
 	"consumption_tracker/cmd/internal/infrastructure/dtos"
 	"consumption_tracker/cmd/pkg/errors"
 	"consumption_tracker/cmd/pkg/utils"
@@ -21,7 +20,7 @@ type Repository struct {
 	db *sql.DB
 }
 
-func NewPostgresqlRepository(db *sql.DB) ports.ConsumptionRepository {
+func NewPostgresqlRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 

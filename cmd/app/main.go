@@ -37,7 +37,7 @@ func main() {
 		consumptionService := services.NewEnergyConsumptionService(repository, addressService)
 
 		// Initialize handlers
-		consumptionHandler := handlers.NewConsumptionHandler(*consumptionService)
+		consumptionHandler := handlers.NewConsumptionHandler(consumptionService)
 
 		// Set up the router
 		router := gin.Default()

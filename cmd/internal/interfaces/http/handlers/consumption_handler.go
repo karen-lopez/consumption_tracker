@@ -8,10 +8,10 @@ import (
 )
 
 type ConsumptionHandler struct {
-	Service services.EnergyConsumptionService
+	Service *services.EnergyConsumptionService
 }
 
-func NewConsumptionHandler(service services.EnergyConsumptionService) *ConsumptionHandler {
+func NewConsumptionHandler(service *services.EnergyConsumptionService) *ConsumptionHandler {
 	return &ConsumptionHandler{Service: service}
 }
 

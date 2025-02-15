@@ -6,5 +6,5 @@ import (
 )
 
 type ConsumptionRepository interface {
-	GetConsumption(ctx context.Context, meterID int, startDate, endDate string) ([]domain.EnergyConsumption, error)
+	GetConsumption(ctx context.Context, meterId int, startDate, endDate string) ([]domain.EnergyConsumption, error)
 }

@@ -18,7 +18,7 @@ func NewAddressClient(client *http.Client, baseURL string) *AddressClient {
 	return &AddressClient{client: client, baseURL: baseURL}
 }
 
-func (a AddressClient) GetAddressByMeterID(ctx context.Context, meterID int) (string, error) {
+func (a *AddressClient) GetAddressByMeterID(ctx context.Context, meterID int) (string, error) {
 	params := url.Values{}
 	params.Add("meter_id", fmt.Sprintf("%d", meterID))
 	req, requestErr := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/meter?%s", a.baseURL, params.Encode()), nil)
