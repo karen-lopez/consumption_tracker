@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"consumption_tracker/cmd/internal/application/services"
+	"consumption_tracker/cmd/internal/core/ports"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
 type ConsumptionHandler struct {
-	Service *services.EnergyConsumptionService
+	Service ports.ConsumptionTrackerService
 }
 
-func NewConsumptionHandler(service *services.EnergyConsumptionService) *ConsumptionHandler {
+func NewConsumptionHandler(service ports.ConsumptionTrackerService) *ConsumptionHandler {
 	return &ConsumptionHandler{Service: service}
 }
 
