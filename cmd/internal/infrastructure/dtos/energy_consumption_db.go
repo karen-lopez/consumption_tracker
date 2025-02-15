@@ -9,5 +9,5 @@ type EnergyConsumptionDB struct {
 	ReactiveEnergy     int       `db:"reactive_energy"`
 	CapacitiveReactive int       `db:"capacitive_reactive"`
 	Solar              int       `db:"solar"`
-	Date               time.Time `db:"date"`
+	ConsumptionDate    time.Time `db:"consumption_date"`
 }
