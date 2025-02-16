@@ -1,0 +1,92 @@
+definitions:
+  dtos.ConsumptionResponse:
+    properties:
+      data_graph:
+        items:
+          $ref: '#/definitions/dtos.MeterData'
+        type: array
+      period:
+        items:
+          type: string
+        type: array
+    type: object
+  dtos.MeterData:
+    properties:
+      active:
+        items:
+          type: integer
+        type: array
+      address:
+        type: string
+      exported:
+        items:
+          type: integer
+        type: array
+      meter_id:
+        type: integer
+      reactive_capacitive:
+        items:
+          type: integer
+        type: array
+      reactive_inductive:
+        items:
+          type: integer
+        type: array
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /consumption:
+    get:
+      consumes:
+      - application/json
+      description: Get energy consumption data for a specific meter within a date
+        range
+      parameters:
+      - description: Meter ID
+        in: query
+        name: meter_id
+        required: true
+        type: integer
+      - description: Start date in YYYY-MM-DD format
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date in YYYY-MM-DD format
+        in: query
+        name: end_date
+        required: true
+        type: string
+      - description: Period type (daily, weekly, monthly)
+        in: query
+        name: kind_period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ConsumptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get energy consumption data
+      tags:
+      - consumption
+swagger: "2.0"

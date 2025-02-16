@@ -1,0 +1,18 @@
+graph TD
+    subgraph Interfaces
+        A[API REST] --> B[EnergyHandler]
+    end
+    subgraph Application
+        B --> C[EnergyService]
+    end
+    subgraph Core
+        C --> D[Ports]
+        D --> E[EnergyRepository Interface]
+        D --> F[AddressService Interface]
+    end
+    subgraph Infrastructure
+        E --> G[[PostgresRepository]]
+        F --> H[[HTTPAddressClient]]
+        G --> I[(PostgreSQL)]
+        H --> J[Address microservice API]
+    end
