@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/consumption": {
             "get": {
-                "description": "Get energy consumption data for a specific meter within a date range",
+                "description": "Get energy consumption data for specific meters within a date range",
                 "consumes": [
                     "application/json"
                 ],
@@ -30,9 +30,9 @@ const docTemplate = `{
                 "summary": "Get energy consumption data",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Meter ID",
-                        "name": "meter_id",
+                        "type": "string",
+                        "description": "Comma-separated list of meter IDs",
+                        "name": "meters_ids",
                         "in": "query",
                         "required": true
                     },
@@ -143,7 +143,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "error message"
                 }
             }
         }
@@ -160,6 +161,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {
