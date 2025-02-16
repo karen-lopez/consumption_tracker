@@ -36,6 +36,7 @@ definitions:
   handlers.ErrorResponse:
     properties:
       error:
+        example: error message
         type: string
     type: object
 info:
@@ -45,14 +46,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get energy consumption data for a specific meter within a date
-        range
+      description: Get energy consumption data for specific meters within a date range
       parameters:
-      - description: Meter ID
+      - description: Comma-separated list of meter IDs
         in: query
-        name: meter_id
+        name: meters_ids
         required: true
-        type: integer
+        type: string
       - description: Start date in YYYY-MM-DD format
         in: query
         name: start_date
