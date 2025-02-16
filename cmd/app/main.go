@@ -6,10 +6,13 @@ import (
 	"consumption_tracker/cmd/internal/infrastructure/database/postgresql"
 	"consumption_tracker/cmd/internal/infrastructure/httpclient"
 	"consumption_tracker/cmd/internal/interfaces/http/handlers"
+	_ "consumption_tracker/docs"
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 )
 
@@ -42,6 +45,7 @@ func main() {
 		// Set up the router
 		router := gin.Default()
 		router.GET("/consumption", consumptionHandler.GetConsumption)
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 		// Start the server
 		if err := router.Run(fmt.Sprintf(":%s", loadedConfig.ServerPort)); err != nil {
